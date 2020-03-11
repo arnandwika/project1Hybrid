@@ -105,6 +105,9 @@ class Tambah extends StatelessWidget{
         firstDate: new DateTime(2010),
         lastDate: new DateTime(2030)
     );
+    if(picked != null && picked != _date){
+      print("Date Selected: ${_date.toString()}");
+    }
   }
 
   @override
@@ -120,10 +123,10 @@ class Tambah extends StatelessWidget{
                 hintText:"Judul",
               ),
             ),
-            new TextField(
-              decoration: InputDecoration(
-                hintText: "yyyy/mm/dd",
-              ),
+            new Text('Date Selected: ${_date.toString()}'),
+            new RaisedButton(
+              child: new Text('Select date'),
+                onPressed: (){_selectDate(context);}
             ),
             new TextField(
               maxLines: 5,
