@@ -2,13 +2,16 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:project1/Reminder.dart';
+import 'package:sqflite/sqflite.dart';
 
 void main() => runApp(MyApp());
-
+List<Map> list;
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
+
   @override
   Widget build(BuildContext context) {
+    BuatDb();
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
@@ -26,7 +29,8 @@ class Home extends StatefulWidget{
 }
 
 class MyCard extends State<Home>{
-  List cards = new List.generate(20, (i)=>new CustomCard()).toList();
+  int jmlh = list.length;
+  List cards = new List.generate(list.length, (i)=>new CustomCard()).toList();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -58,6 +62,40 @@ class MyCard extends State<Home>{
   }
 }
 
+class ObjectReminder{
+  String judul;
+  String tanggal;
+  String isi;
+  ObjectReminder({this.judul,this.tanggal,this.isi});
+  Map<String, dynamic> toMap(){
+    return{
+      'judul': judul,
+      'isi': isi,
+      'tanggal': tanggal,
+    };
+  }
+}
+
+void BuatDb() async{
+  var databasesPath = await getDatabasesPath();
+  String path = databasesPath +'project1.db';
+  await deleteDatabase(path);
+  Database database = await openDatabase(
+      path,
+      version: 1,
+      onCreate: (db, version) async{
+        await db.execute(
+          "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
+      }
+  );
+  ObjectReminder o1 = ObjectReminder(judul:"coba1", tanggal:"2020-12-20",isi:"pengujian");
+  ObjectReminder o2 = ObjectReminder(judul:"coba2", tanggal:"2020-03-20",isi:"pengujian");
+  database.insert('reminder', o1.toMap());
+  database.insert('reminder', o2.toMap());
+  list = await database.rawQuery('SELECT * FROM reminder');
+  print(list.length);
+}
+int i=0;
 class CustomCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -70,31 +108,34 @@ class CustomCard extends StatelessWidget {
         },
         child: new Column(
           children: <Widget>[
-            new Image.network('https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg'),
+            Text(list[i]['judul']),
+//            new Image.network('https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg'),
             new Padding(
                 padding: new EdgeInsets.all(7.0),
-                child: new Row(
-                  children: <Widget>[
-                    new Padding(
-                      padding: new EdgeInsets.all(7.0),
-                      child: new Icon(Icons.thumb_up),
-                    ),
-                    new Padding(
-                      padding: new EdgeInsets.all(7.0),
-                      child: new Text('Like',style: new TextStyle(fontSize: 18.0),),
-                    ),
-                    new Padding(
-                      padding: new EdgeInsets.all(7.0),
-                      child: new Icon(Icons.comment),
-                    ),
-                    new Padding(
-                      padding: new EdgeInsets.all(7.0),
-                      child: new Text('Comments',style: new TextStyle(fontSize: 18.0)),
-                    )
-
-                  ],
-                )
-            )
+//                child: new Row(
+//                  children: <Widget>[
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Icon(Icons.thumb_up),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Text('Like',style: new TextStyle(fontSize: 18.0),),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Icon(Icons.comment),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Text('Comments',style: new TextStyle(fontSize: 18.0)),
+//                    )
+//
+//                  ],
+//                )
+            ),
+            Text(""),
+            Text(""),
           ],
         ),
       ),
