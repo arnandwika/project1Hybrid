@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:project1/Reminder.dart';
 
 void main() => runApp(MyApp());
 
@@ -9,7 +10,12 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
-        home:new Home()
+      debugShowCheckedModeBanner: false,
+      initialRoute: '/',
+        routes: <String, WidgetBuilder>{
+          '/': (context) => Home(),
+          '/openreminder': (context) => Reminder("","",""),
+        }
     );
   }
 }
@@ -58,7 +64,9 @@ class CustomCard extends StatelessWidget {
     return  new Card(
       child: InkWell(
         onTap: (){
-          print('MASUK');
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) =>Reminder("tes","16-03-2020","Lorem adslgfjkhasldgfjh"),
+          ),);
         },
         child: new Column(
           children: <Widget>[
