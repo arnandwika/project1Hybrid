@@ -6,21 +6,61 @@ import 'package:sqflite/sqflite.dart';
 
 void main() => runApp(MyApp());
 List<Map> list;
+bool cekDB=false;
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   @override
   Widget build(BuildContext context) {
-    BuatDb();
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => Home(),
+          '/': (context) => FirstPage(),
+          'home': (context) => Home(),
           '/openreminder': (context) => Reminder("","",""),
         }
     );
   }
+}
+
+class FirstPage extends StatelessWidget{
+  @override
+  Widget build(BuildContext context) {
+    if(cekDB==false){
+      BuatDb();
+    }
+    return new Scaffold(
+      appBar: new AppBar(
+        title: new Text("Reminder"),
+      ),
+      body: new Padding(
+        padding: EdgeInsets.all(7.0),
+        child: new Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            new Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: <Widget>[
+                new RaisedButton(
+                  onPressed: ()=>{
+                    Navigator.pushNamed(context, 'home'),
+                  },
+                  child: new Text("List Reminder"),
+                ),
+                new RaisedButton(
+                  onPressed: ()=>{},
+                  child: new Text("History"),
+                )
+              ],
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
 }
 
 class Home extends StatefulWidget{
@@ -77,6 +117,7 @@ class ObjectReminder{
 }
 
 void BuatDb() async{
+  cekDB=true;
   var databasesPath = await getDatabasesPath();
   String path = databasesPath +'project1.db';
   await deleteDatabase(path);
