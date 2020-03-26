@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'Edit.dart';
+import 'main.dart';
 
-void main() => runApp(Reminder("","",""));
+
+void main() => runApp(Reminder(0));
 
 
 class Reminder extends StatelessWidget{
-  String judul;
-  String tanggal;
-  String deskripsi;
-  Reminder(this.judul,this.tanggal,this.deskripsi);
-  @override
+  int id=0;
+  void printList() async{
+    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
+  }
+  Reminder(this.id);
+    @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -20,14 +23,14 @@ class Reminder extends StatelessWidget{
         child: Column(
           children: <Widget>[
             Text(
-              '${this.judul}',
+              list[0]['judul'].toString(),
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 30
               ),
             ),
             Text(
-              '${this.tanggal}',
+              list[0]['tanggal'].toString(),
               style: TextStyle(
                 fontSize: 14,
               ),
@@ -36,7 +39,7 @@ class Reminder extends StatelessWidget{
               child: Container(
                 height: 200,
                 child: Text(
-                    '${this.deskripsi}'
+                    list[0]['isi'].toString()
                 ),
               ),
             ),
@@ -64,7 +67,7 @@ class Reminder extends StatelessWidget{
                     child: RaisedButton(
                       onPressed: () => {
                         Navigator.push(context, MaterialPageRoute(
-                          builder: (context) =>Edit(judul,this.tanggal,this.deskripsi),
+                          builder: (context) =>Edit(id, list[0]['judul'].toString(), list[0]['tanggal'].toString(), list[0]['isi'].toString()),
                         )),
                       },
                       color: Colors.deepOrangeAccent,
