@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 
 import 'Edit.dart';
+import 'main.dart';
 
-void main() => runApp(Reminder("","",""));
+
+void main() => runApp(Reminder(0,"","",""));
+
 
 
 class Reminder extends StatelessWidget{
+  int id;
   String judul;
+  String isi;
   String tanggal;
-  String deskripsi;
-  Reminder(this.judul,this.tanggal,this.deskripsi);
-  @override
+  Reminder(this.id, this.judul, this.isi, this.tanggal);
+//  void printList() async{
+//    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
+//    print(list);
+//  }
+    @override
   Widget build(BuildContext context) {
+      OpenDb();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
@@ -20,14 +29,14 @@ class Reminder extends StatelessWidget{
         child: Column(
           children: <Widget>[
             Text(
-              '${this.judul}',
+              judul,
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 30
               ),
             ),
             Text(
-              '${this.tanggal}',
+              tanggal,
               style: TextStyle(
                 fontSize: 14,
               ),
@@ -36,7 +45,7 @@ class Reminder extends StatelessWidget{
               child: Container(
                 height: 200,
                 child: Text(
-                    '${this.deskripsi}'
+                   isi
                 ),
               ),
             ),
@@ -64,7 +73,7 @@ class Reminder extends StatelessWidget{
                     child: RaisedButton(
                       onPressed: () => {
                         Navigator.push(context, MaterialPageRoute(
-                          builder: (context) =>Edit(judul,this.tanggal,this.deskripsi),
+                          builder: (context) =>Edit(id,judul, tanggal, isi),
                         )),
                       },
                       color: Colors.deepOrangeAccent,

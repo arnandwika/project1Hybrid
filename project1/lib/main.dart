@@ -1,3 +1,4 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
@@ -6,19 +7,20 @@ import 'package:sqflite/sqflite.dart';
 
 void main() => runApp(MyApp());
 List<Map> list;
-bool cekDB=false;
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   @override
   Widget build(BuildContext context) {
+    BuatDb();
+    OpenDb();
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => FirstPage(),
-          'home': (context) => Home(),
-          '/openreminder': (context) => Reminder("","",""),
+          '/': (context) => Home(),
+          '/openreminder': (context) => Reminder(0,"","",""),
         }
     );
   }
@@ -70,7 +72,7 @@ class Home extends StatefulWidget{
 
 class MyCard extends State<Home>{
   int jmlh = list.length;
-  List cards = new List.generate(list.length, (i)=>new CustomCard()).toList();
+  List cards = new List.generate(list.length, (int index)=>new CustomCard(index)).toList();
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -92,7 +94,7 @@ class MyCard extends State<Home>{
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context)=> Tambah()
+                      builder: (context)=> StateTambah()
                   )
               );
             }
@@ -115,13 +117,13 @@ class ObjectReminder{
     };
   }
 }
-
+Database database;
 void BuatDb() async{
   cekDB=true;
   var databasesPath = await getDatabasesPath();
   String path = databasesPath +'project1.db';
   await deleteDatabase(path);
-  Database database = await openDatabase(
+  database = await openDatabase(
       path,
       version: 1,
       onCreate: (db, version) async{
@@ -129,27 +131,39 @@ void BuatDb() async{
           "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
       }
   );
-  ObjectReminder o1 = ObjectReminder(judul:"coba1", tanggal:"2020-12-20",isi:"pengujian");
-  ObjectReminder o2 = ObjectReminder(judul:"coba2", tanggal:"2020-03-20",isi:"pengujian");
+  ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020/12/20",isi:"pengujian");
+  ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020/03/20",isi:"pengujian yang kedua");
+  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020/04/19",isi:"pengujian yang kedua");
   database.insert('reminder', o1.toMap());
   database.insert('reminder', o2.toMap());
-  list = await database.rawQuery('SELECT * FROM reminder');
-  print(list.length);
+  database.insert('reminder', o3.toMap());
+  OpenDb();
+  print(list);
 }
-int i=0;
+void InsertDb(ObjectReminder o1) async{
+  database.insert('reminder',o1.toMap());
+}
+void OpenDb() async{
+  list = await database.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
+}
 class CustomCard extends StatelessWidget {
+  int i;
+  CustomCard(this.i);
   @override
   Widget build(BuildContext context) {
-    return  new Card(
+    return new Card(
       child: InkWell(
-        onTap: (){
+        onTap: ()=>{
           Navigator.push(context, MaterialPageRoute(
-            builder: (context) =>Reminder("tes","16-03-2020","Lorem adslgfjkhasldgfjh"),
-          ),);
+            builder: (context) =>Reminder(
+              list[i]['id'],list[i]['judul'],list[i]['isi'],list[i]['tanggal']
+            ),
+          ),
+            ),
         },
         child: new Column(
           children: <Widget>[
-            Text(list[i]['judul']),
+            Text(list[i]['judul']+" "+list[i]['id'].toString()),
 //            new Image.network('https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg'),
             new Padding(
                 padding: new EdgeInsets.all(7.0),
@@ -175,8 +189,8 @@ class CustomCard extends StatelessWidget {
 //                  ],
 //                )
             ),
-            Text(""),
-            Text(""),
+            Text(list[i]['tanggal']),
+            Text(list[i]['isi']),
           ],
         ),
       ),
@@ -184,22 +198,17 @@ class CustomCard extends StatelessWidget {
   }
 }
 
-class Tambah extends StatelessWidget{
-  DateTime _date = new DateTime.now();
-  TimeOfDay _time = new TimeOfDay.now();
+class StateTambah extends StatefulWidget{
+  @override
+  State createState() => Tambah();
+}
 
-  Future<Null> _selectDate(BuildContext context) async{
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: _date,
-        firstDate: new DateTime(2010),
-        lastDate: new DateTime(2030)
-    );
-    if(picked != null && picked != _date){
-      print("Date Selected: ${_date.toString()}");
-    }
-  }
-
+class Tambah extends State<StateTambah>{
+  String tanggalJam=" ";
+  ObjectReminder objectInsert;
+  final _JudulEditingController = TextEditingController();
+  final _IsiEditingController = TextEditingController();
+  final format = DateFormat("yyyy-MM-dd HH:mm");
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -208,21 +217,50 @@ class Tambah extends StatelessWidget{
       body: new Padding(padding: EdgeInsets.all(15.0),
         child: new Column(
           children: <Widget>[
+            Text("Judul:"),
             new TextField(
+              controller: _JudulEditingController,
               decoration: InputDecoration(
                 hintText:"Judul",
               ),
             ),
-            new Text('Date Selected: ${_date.toString()}'),
-            new RaisedButton(
-              child: new Text('Select date'),
-                onPressed: (){_selectDate(context);}
+            Text("Tanggal & Waktu:"),
+            new DateTimeField(
+              format: format,
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                    TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  tanggalJam = (DateTimeField.combine(date, time)).toString();
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
             ),
+            Text("Deskripsi:"),
             new TextField(
+              controller: _IsiEditingController,
               maxLines: 5,
               decoration: InputDecoration(
                 hintText: "Description",
               ),
+            ),
+            RaisedButton(
+              child: Text("Save"),
+              onPressed: (){
+                objectInsert= new ObjectReminder(judul: _JudulEditingController.text, isi: _IsiEditingController.text, tanggal: tanggalJam);
+                InsertDb(objectInsert);
+                Navigator.pop(context);
+              },
             )
           ],
         ),
