@@ -1,3 +1,4 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
@@ -19,7 +20,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
           '/': (context) => Home(),
-          '/openreminder': (context) => Reminder(0),
+          '/openreminder': (context) => Reminder(0,"","",""),
         }
     );
   }
@@ -54,7 +55,7 @@ class MyCard extends State<Home>{
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context)=> Tambah()
+                      builder: (context)=> StateTambah()
                   )
               );
             }
@@ -99,6 +100,9 @@ void BuatDb() async{
   OpenDb();
   print(list);
 }
+void InsertDb(ObjectReminder o1) async{
+  database.insert('reminder',o1.toMap());
+}
 void OpenDb() async{
   list = await database.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
 }
@@ -107,12 +111,12 @@ class CustomCard extends StatelessWidget {
   CustomCard(this.i);
   @override
   Widget build(BuildContext context) {
-    return  new Card(
+    return new Card(
       child: InkWell(
         onTap: ()=>{
           Navigator.push(context, MaterialPageRoute(
             builder: (context) =>Reminder(
-              list[i]['id']
+              list[i]['id'],list[i]['judul'],list[i]['isi'],list[i]['tanggal']
             ),
           ),
             ),
@@ -154,22 +158,17 @@ class CustomCard extends StatelessWidget {
   }
 }
 
-class Tambah extends StatelessWidget{
-  DateTime _date = new DateTime.now();
-  TimeOfDay _time = new TimeOfDay.now();
+class StateTambah extends StatefulWidget{
+  @override
+  State createState() => Tambah();
+}
 
-  Future<Null> _selectDate(BuildContext context) async{
-    final DateTime picked = await showDatePicker(
-        context: context,
-        initialDate: _date,
-        firstDate: new DateTime(2010),
-        lastDate: new DateTime(2030)
-    );
-    if(picked != null && picked != _date){
-      print("Date Selected: ${_date.toString()}");
-    }
-  }
-
+class Tambah extends State<StateTambah>{
+  String tanggalJam=" ";
+  ObjectReminder objectInsert;
+  final _JudulEditingController = TextEditingController();
+  final _IsiEditingController = TextEditingController();
+  final format = DateFormat("yyyy-MM-dd HH:mm");
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -178,21 +177,50 @@ class Tambah extends StatelessWidget{
       body: new Padding(padding: EdgeInsets.all(15.0),
         child: new Column(
           children: <Widget>[
+            Text("Judul:"),
             new TextField(
+              controller: _JudulEditingController,
               decoration: InputDecoration(
                 hintText:"Judul",
               ),
             ),
-            new Text('Date Selected: ${_date.toString()}'),
-            new RaisedButton(
-              child: new Text('Select date'),
-                onPressed: (){_selectDate(context);}
+            Text("Tanggal & Waktu:"),
+            new DateTimeField(
+              format: format,
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                    TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  tanggalJam = (DateTimeField.combine(date, time)).toString();
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
             ),
+            Text("Deskripsi:"),
             new TextField(
+              controller: _IsiEditingController,
               maxLines: 5,
               decoration: InputDecoration(
                 hintText: "Description",
               ),
+            ),
+            RaisedButton(
+              child: Text("Save"),
+              onPressed: (){
+                objectInsert= new ObjectReminder(judul: _JudulEditingController.text, isi: _IsiEditingController.text, tanggal: tanggalJam);
+                InsertDb(objectInsert);
+                Navigator.pop(context);
+              },
             )
           ],
         ),

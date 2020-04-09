@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'Reminder.dart';
 import 'main.dart';
 
 void main() => runApp(Edit(0,"","",""));
-void OpenDb() async{
+void OpenDbEdit() async{
   var databasesPath = await getDatabasesPath();
   String path = databasesPath +'project1.db';
   await deleteDatabase(path);
@@ -109,7 +110,7 @@ class EditState extends State<Edit>{
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
               updateDb(id, TextJudulController.text, TextTanggalController.text, TextIsiController.text),
                 print(list),
-                Navigator.pop(context)
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,TextTanggalController.text)))
               },
               child: Text("Save"),
             ),

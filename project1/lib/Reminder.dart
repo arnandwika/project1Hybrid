@@ -4,17 +4,23 @@ import 'Edit.dart';
 import 'main.dart';
 
 
-void main() => runApp(Reminder(0));
+void main() => runApp(Reminder(0,"","",""));
+
 
 
 class Reminder extends StatelessWidget{
-  int id=0;
-  void printList() async{
-    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
-  }
-  Reminder(this.id);
+  int id;
+  String judul;
+  String isi;
+  String tanggal;
+  Reminder(this.id, this.judul, this.isi, this.tanggal);
+//  void printList() async{
+//    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
+//    print(list);
+//  }
     @override
   Widget build(BuildContext context) {
+      OpenDb();
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
@@ -23,14 +29,14 @@ class Reminder extends StatelessWidget{
         child: Column(
           children: <Widget>[
             Text(
-              list[0]['judul'].toString(),
+              judul,
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 30
               ),
             ),
             Text(
-              list[0]['tanggal'].toString(),
+              tanggal,
               style: TextStyle(
                 fontSize: 14,
               ),
@@ -39,7 +45,7 @@ class Reminder extends StatelessWidget{
               child: Container(
                 height: 200,
                 child: Text(
-                    list[0]['isi'].toString()
+                   isi
                 ),
               ),
             ),
@@ -67,7 +73,7 @@ class Reminder extends StatelessWidget{
                     child: RaisedButton(
                       onPressed: () => {
                         Navigator.push(context, MaterialPageRoute(
-                          builder: (context) =>Edit(id, list[0]['judul'].toString(), list[0]['tanggal'].toString(), list[0]['isi'].toString()),
+                          builder: (context) =>Edit(id,judul, tanggal, isi),
                         )),
                       },
                       color: Colors.deepOrangeAccent,
