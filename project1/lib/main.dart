@@ -1,3 +1,4 @@
+
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -7,20 +8,22 @@ import 'package:sqflite/sqflite.dart';
 
 void main() => runApp(MyApp());
 List<Map> list;
+List<Map> listHistory;
+bool cekDB=false;
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
   @override
   Widget build(BuildContext context) {
-    BuatDb();
-    OpenDb();
     return new MaterialApp(
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => Home(),
+          '/': (context) => FirstPage(),
+          '/home': (context) => Home(),
           '/openreminder': (context) => Reminder(0,"","",""),
+          '/history': (context) => History(),
         }
     );
   }
@@ -47,12 +50,16 @@ class FirstPage extends StatelessWidget{
               children: <Widget>[
                 new RaisedButton(
                   onPressed: ()=>{
-                    Navigator.pushNamed(context, 'home'),
+                    OpenDb(),
+                    Navigator.pushNamed(context, '/home'),
                   },
                   child: new Text("List Reminder"),
                 ),
                 new RaisedButton(
-                  onPressed: ()=>{},
+                  onPressed: ()=>{
+                    searchHistory(),
+                    Navigator.pushNamed(context, '/history')
+                  },
                   child: new Text("History"),
                 )
               ],
@@ -131,9 +138,9 @@ void BuatDb() async{
           "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
       }
   );
-  ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020/12/20",isi:"pengujian");
-  ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020/03/20",isi:"pengujian yang kedua");
-  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020/04/19",isi:"pengujian yang kedua");
+  ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020-12-20 23:30",isi:"pengujian");
+  ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020-03-20 07:30",isi:"pengujian yang kedua");
+  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020-04-19 22:00",isi:"pengujian yang kedua");
   database.insert('reminder', o1.toMap());
   database.insert('reminder', o2.toMap());
   database.insert('reminder', o3.toMap());
@@ -259,6 +266,7 @@ class Tambah extends State<StateTambah>{
               onPressed: (){
                 objectInsert= new ObjectReminder(judul: _JudulEditingController.text, isi: _IsiEditingController.text, tanggal: tanggalJam);
                 InsertDb(objectInsert);
+                OpenDb();
                 Navigator.pop(context);
               },
             )
@@ -309,3 +317,100 @@ class Tambah extends State<StateTambah>{
 //    );
 //  }
 //}
+class History extends StatefulWidget{
+  @override
+  MyHistory createState()=> new MyHistory();
+}
+
+class MyHistory extends State<History>{
+  int jmlh = listHistory.length;
+  List cards = new List.generate(listHistory.length, (int index)=>new CardHistory(index)).toList();
+  @override
+  Widget build(BuildContext context) {
+    return new Scaffold(
+        appBar: new AppBar(
+          title: new Text('Reminder'),
+          backgroundColor: Colors.deepOrange,
+        ),
+        body: new Container(
+            child: new ListView(
+              children: cards,
+            )
+
+        ),
+        floatingActionButton: new FloatingActionButton(
+            elevation: 0.0,
+            child: new Icon(Icons.add_circle),
+            backgroundColor: new Color(0xFFE57373),
+            onPressed: (){
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context)=> StateTambah()
+                  )
+              );
+            }
+        )
+    );
+  }
+}
+
+void searchHistory() async{
+  DateTime waktu = DateTime.now();
+  String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(waktu);
+  listHistory = await database.rawQuery('SELECT * FROM reminder WHERE tanggal < "'+formattedDate+'" ORDER BY tanggal ASC');
+  print(formattedDate);
+  print(listHistory);
+}
+
+class CardHistory extends StatelessWidget {
+  int i;
+  CardHistory(this.i);
+  @override
+  Widget build(BuildContext context) {
+    return new Card(
+      child: InkWell(
+        onTap: ()=>{
+          Navigator.push(context, MaterialPageRoute(
+            builder: (context) =>Reminder(
+                listHistory[i]['id'],listHistory[i]['judul'],listHistory[i]['isi'],listHistory[i]['tanggal']
+            ),
+          ),
+          ),
+        },
+        child: new Column(
+          children: <Widget>[
+            Text(listHistory[i]['judul']+" "+listHistory[i]['id'].toString()),
+//            new Image.network('https://i.ytimg.com/vi/fq4N0hgOWzU/maxresdefault.jpg'),
+            new Padding(
+              padding: new EdgeInsets.all(7.0),
+//                child: new Row(
+//                  children: <Widget>[
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Icon(Icons.thumb_up),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Text('Like',style: new TextStyle(fontSize: 18.0),),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Icon(Icons.comment),
+//                    ),
+//                    new Padding(
+//                      padding: new EdgeInsets.all(7.0),
+//                      child: new Text('Comments',style: new TextStyle(fontSize: 18.0)),
+//                    )
+//
+//                  ],
+//                )
+            ),
+            Text(listHistory[i]['tanggal']),
+            Text(listHistory[i]['isi']),
+          ],
+        ),
+      ),
+    );
+  }
+}
