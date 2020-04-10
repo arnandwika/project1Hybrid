@@ -1,4 +1,5 @@
 
+import 'package:date_format/date_format.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -10,7 +11,10 @@ void main() => runApp(MyApp());
 List<Map> list;
 List<Map> listHistory;
 bool cekDB=false;
-
+Color fix;
+Color hijau = Colors.lightGreenAccent[400];
+Color amber = Colors.amber;
+Color merah = Colors.red;
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
@@ -140,7 +144,7 @@ void BuatDb() async{
   );
   ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020-12-20 23:30",isi:"pengujian");
   ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020-03-20 07:30",isi:"pengujian yang kedua");
-  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020-04-19 22:00",isi:"pengujian yang kedua");
+  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020-04-15 22:00",isi:"pengujian yang kedua");
   database.insert('reminder', o1.toMap());
   database.insert('reminder', o2.toMap());
   database.insert('reminder', o3.toMap());
@@ -153,12 +157,30 @@ void InsertDb(ObjectReminder o1) async{
 void OpenDb() async{
   list = await database.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
 }
+DateTime convertDateFromString(String strDate){
+  DateTime todayDate = DateTime.parse(strDate);
+  return todayDate;
+}
+Color selectColor(String tgl){
+  DateTime waktu = DateTime.now();
+  DateTime pembanding = convertDateFromString(tgl);
+  Duration diff= waktu.difference(pembanding);
+  if(diff.inDays>=-3){
+    return merah;
+  }else if(diff.inDays>=-7){
+    return amber;
+  }else{
+    return hijau;
+  }
+}
 class CustomCard extends StatelessWidget {
   int i;
   CustomCard(this.i);
+
   @override
   Widget build(BuildContext context) {
     return new Card(
+      color: selectColor(list[i]['tanggal']),
       child: InkWell(
         onTap: ()=>{
           Navigator.push(context, MaterialPageRoute(
