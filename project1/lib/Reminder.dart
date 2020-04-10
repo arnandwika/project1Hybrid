@@ -14,6 +14,9 @@ class Reminder extends StatelessWidget{
   String isi;
   String tanggal;
   Reminder(this.id, this.judul, this.isi, this.tanggal);
+  void hapusData(int id) async{
+    database.delete('reminder',where: "id=?", whereArgs: [id]);
+  }
 //  void printList() async{
 //    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
 //    print(list);
@@ -56,6 +59,11 @@ class Reminder extends StatelessWidget{
                   Expanded(
                     child: RaisedButton(
                       onPressed: () => {
+                          hapusData(id),
+                        Navigator.pop(context),
+                        Navigator.pop(context),
+                        OpenDb(),
+                        Navigator.pushNamed(context, '/home'),
 
                       },
                       color: Colors.deepOrangeAccent,
