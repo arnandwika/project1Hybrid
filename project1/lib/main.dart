@@ -58,15 +58,15 @@ class FirstPage extends StatelessWidget{
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
                 new RaisedButton(
-                  onPressed: ()=>{
-                    OpenDb(),
+                  onPressed: () async =>{
+                    await OpenDb(),
                     Navigator.pushNamed(context, '/home'),
                   },
                   child: new Text("List Reminder"),
                 ),
                 new RaisedButton(
-                  onPressed: ()=>{
-                    searchHistory(),
+                  onPressed: () async =>{
+                    await searchHistory(),
                     Navigator.pushNamed(context, '/history')
                   },
                   child: new Text("History"),
@@ -88,7 +88,14 @@ class Home extends StatefulWidget{
 
 class MyCard extends State<Home>{
   int jmlh = list.length;
-  List cards = new List.generate(list.length, (int index)=>new CustomCard(index)).toList();
+  List cards = new List.generate(list.length, (int index)=>new StateCard(index)).toList();
+
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
@@ -181,22 +188,38 @@ Color selectColor(String tgl){
     return hijau;
   }
 }
-class CustomCard extends StatelessWidget {
+
+class StateCard extends StatefulWidget{
+  int i;
+  StateCard(this.i);
+  @override
+  CustomCard createState()=> new CustomCard(i);
+}
+
+class CustomCard extends State<StateCard> {
   int i;
   CustomCard(this.i);
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     return new Card(
       color: selectColor(list[i]['tanggal']),
       child: InkWell(
-        onTap: ()=>{
-          Navigator.push(context, MaterialPageRoute(
-            builder: (context) =>Reminder(
-              list[i]['id'],list[i]['judul'],list[i]['isi'],list[i]['tanggal']
-            ),
-          ),
-            ),
+        onTap: (){
+          Navigator.of(context).push(MaterialPageRoute<String>(
+            builder: (BuildContext context) {
+              return Reminder(
+                  list[i]['id'],list[i]['judul'],list[i]['isi'],list[i]['tanggal']
+              );
+            }
+          )).then((String str){
+//            setState(){};
+          });
         },
         child: new Column(
           children: <Widget>[
@@ -241,6 +264,12 @@ class StateTambah extends StatefulWidget{
 }
 
 class Tambah extends State<StateTambah>{
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
   String tanggalJam=" ";
   ObjectReminder objectInsert;
   final _JudulEditingController = TextEditingController();
@@ -293,10 +322,10 @@ class Tambah extends State<StateTambah>{
             ),
             RaisedButton(
               child: Text("Save"),
-              onPressed: (){
-                InsertDb(_JudulEditingController.text, tanggalJam, _IsiEditingController.text);
-                OpenDb();
-                Navigator.pop(context);
+              onPressed: () async {
+                await InsertDb(_JudulEditingController.text, tanggalJam, _IsiEditingController.text);
+                await OpenDb();
+                Navigator.pushNamed(context, '/home');
               },
             )
           ],
@@ -352,6 +381,11 @@ class History extends StatefulWidget{
 }
 
 class MyHistory extends State<History>{
+  @override
+  void initState() {
+    super.initState();
+  }
+
   int jmlh = listHistory.length;
   List cards = new List.generate(listHistory.length, (int index)=>new CardHistory(index)).toList();
   @override

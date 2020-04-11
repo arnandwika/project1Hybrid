@@ -60,11 +60,11 @@ class Reminder extends StatelessWidget{
                 children: <Widget>[
                   Expanded(
                     child: RaisedButton(
-                      onPressed: () => {
-                          hapusData(id),
+                      onPressed: () async => {
+                        await hapusData(id),
                         Navigator.pop(context),
                         Navigator.pop(context),
-                        OpenDb(),
+                        await OpenDb(),
                         Navigator.pushNamed(context, '/home'),
 
                       },

@@ -106,10 +106,10 @@ class EditState extends State<Edit>{
               controller: TextIsiController,
             ),
             RaisedButton(
-              onPressed: () =>{
+              onPressed: () async =>{
 //                print(TextJudulController.text),
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
-              updateDb(id, TextJudulController.text, TextTanggalController.text, TextIsiController.text),
+                await updateDb(id, TextJudulController.text, TextTanggalController.text, TextIsiController.text),
                 print(list),
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,TextTanggalController.text)))
               },
