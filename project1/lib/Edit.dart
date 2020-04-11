@@ -3,16 +3,18 @@ import 'package:sqflite/sqflite.dart';
 
 import 'Reminder.dart';
 import 'main.dart';
+import 'DB.dart';
 
 void main() => runApp(Edit(0,"","",""));
-void OpenDbEdit() async{
-  var databasesPath = await getDatabasesPath();
-  String path = databasesPath +'project1.db';
-  await deleteDatabase(path);
-  database = await openDatabase(path);
-//  print(database.isOpen);
-  print(list);
-}
+//void OpenDbEdit() async{
+//  DB helper = DB.instance;
+//  var databasesPath = await getDatabasesPath();
+//  String path = databasesPath +'project1.db';
+//  await deleteDatabase(path);
+//  database.db = await openDatabase(path);
+////  print(database.isOpen);
+//  print(list);
+//}
 Future<bool> databaseExists(String path) =>
     databaseFactory.databaseExists(path);
 class EditRunner extends StatelessWidget{
@@ -60,11 +62,10 @@ class EditState extends State<Edit>{
   final TextTanggalController = TextEditingController();
   final TextIsiController = TextEditingController();
   void updateDb(int id, String judulBaru, String tanggalBaru, String isiBaru) async{
-    int count = await database.rawUpdate(
-        'UPDATE reminder SET judul = ?, tanggal = ?, isi = ? WHERE id = ?',
-        [judulBaru, tanggalBaru, isiBaru, id]);
+    DB helper = DB.instance;
+    int count = await helper.editReminder(judulBaru, tanggalBaru, isiBaru, id);
     print('updated: $count');
-    list = await database.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
+    list = await helper.listReminder();
 }
   @override
   Widget build(BuildContext context) {

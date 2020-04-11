@@ -7,6 +7,8 @@ import 'package:intl/intl.dart';
 import 'package:project1/Reminder.dart';
 import 'package:sqflite/sqflite.dart';
 
+import 'DB.dart';
+
 void main() => runApp(MyApp());
 List<Map> list;
 List<Map> listHistory;
@@ -15,6 +17,7 @@ Color fix;
 Color hijau = Colors.lightGreenAccent[400];
 Color amber = Colors.amber;
 Color merah = Colors.red;
+
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
 
@@ -36,9 +39,11 @@ class MyApp extends StatelessWidget {
 class FirstPage extends StatelessWidget{
   @override
   Widget build(BuildContext context) {
-    if(cekDB==false){
-      BuatDb();
-    }
+//    if(cekDB==false){
+//      BuatDb();
+//      cekDB=true;
+//      print(cekDB);
+//    }
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Reminder"),
@@ -128,34 +133,37 @@ class ObjectReminder{
     };
   }
 }
-Database database;
-void BuatDb() async{
-  cekDB=true;
-  var databasesPath = await getDatabasesPath();
-  String path = databasesPath +'project1.db';
-  await deleteDatabase(path);
-  database = await openDatabase(
-      path,
-      version: 1,
-      onCreate: (db, version) async{
-        await db.execute(
-          "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
-      }
-  );
-  ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020-12-20 23:30",isi:"pengujian");
-  ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020-03-20 07:30",isi:"pengujian yang kedua");
-  ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020-04-15 22:00",isi:"pengujian yang kedua");
-  database.insert('reminder', o1.toMap());
-  database.insert('reminder', o2.toMap());
-  database.insert('reminder', o3.toMap());
-  OpenDb();
-  print(list);
+
+//Future BuatDb() async{
+//  if(database==null){
+//    var databasesPath = await getDatabasesPath();
+//    String path = databasesPath +'project1.db';
+//    await deleteDatabase(path);
+//    database = await openDatabase(
+//        path,
+//        version: 1,
+//        onCreate: (db, version) async{
+//          await db.execute(
+//            "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
+//        }
+//    );
+////    ObjectReminder o1 = ObjectReminder(judul:"harusnya ketiga", tanggal:"2020-12-20 23:30",isi:"pengujian");
+////    ObjectReminder o2 = ObjectReminder(judul:"harusnya pertama", tanggal:"2020-03-20 07:30",isi:"pengujian yang kedua");
+////    ObjectReminder o3 = ObjectReminder(judul:"harusnya kedua", tanggal:"2020-04-15 22:00",isi:"pengujian yang kedua");
+////    database.insert('reminder', o1.toMap());
+////    database.insert('reminder', o2.toMap());
+////    database.insert('reminder', o3.toMap());
+//  }
+//  OpenDb();
+//  print(list);
+//}
+Future InsertDb(String judul, String tanggal, String isi) async{
+  DB helper = DB.instance;
+  await helper.insertReminder(judul, tanggal, isi);
 }
-void InsertDb(ObjectReminder o1) async{
-  database.insert('reminder',o1.toMap());
-}
-void OpenDb() async{
-  list = await database.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
+Future OpenDb() async{
+  DB helper = DB.instance;
+  list = await helper.listReminder();
 }
 DateTime convertDateFromString(String strDate){
   DateTime todayDate = DateTime.parse(strDate);
@@ -286,8 +294,7 @@ class Tambah extends State<StateTambah>{
             RaisedButton(
               child: Text("Save"),
               onPressed: (){
-                objectInsert= new ObjectReminder(judul: _JudulEditingController.text, isi: _IsiEditingController.text, tanggal: tanggalJam);
-                InsertDb(objectInsert);
+                InsertDb(_JudulEditingController.text, tanggalJam, _IsiEditingController.text);
                 OpenDb();
                 Navigator.pop(context);
               },
@@ -360,29 +367,28 @@ class MyHistory extends State<History>{
             )
 
         ),
-        floatingActionButton: new FloatingActionButton(
-            elevation: 0.0,
-            child: new Icon(Icons.add_circle),
-            backgroundColor: new Color(0xFFE57373),
-            onPressed: (){
-              Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context)=> StateTambah()
-                  )
-              );
-            }
-        )
+//        floatingActionButton: new FloatingActionButton(
+//            elevation: 0.0,
+//            child: new Icon(Icons.add_circle),
+//            backgroundColor: new Color(0xFFE57373),
+//            onPressed: (){
+//              Navigator.push(
+//                  context,
+//                  MaterialPageRoute(
+//                      builder: (context)=> StateTambah()
+//                  )
+//              );
+//            }
+//        )
     );
   }
 }
 
-void searchHistory() async{
+Future searchHistory() async{
+  DB helper = DB.instance;
   DateTime waktu = DateTime.now();
   String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(waktu);
-  listHistory = await database.rawQuery('SELECT * FROM reminder WHERE tanggal < "'+formattedDate+'" ORDER BY tanggal ASC');
-  print(formattedDate);
-  print(listHistory);
+  listHistory = await helper.listHistory(formattedDate);
 }
 
 class CardHistory extends StatelessWidget {

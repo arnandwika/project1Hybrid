@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'Edit.dart';
 import 'main.dart';
+import 'DB.dart';
 
 
 void main() => runApp(Reminder(0,"","",""));
@@ -15,7 +16,8 @@ class Reminder extends StatelessWidget{
   String tanggal;
   Reminder(this.id, this.judul, this.isi, this.tanggal);
   void hapusData(int id) async{
-    database.delete('reminder',where: "id=?", whereArgs: [id]);
+    DB helper = DB.instance;
+    helper.deleteReminder(id);
   }
 //  void printList() async{
 //    list = await database.rawQuery("SELECT * FROM reminder WHERE id="+id.toString()+"");
