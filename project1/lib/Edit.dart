@@ -1,4 +1,6 @@
+import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'Reminder.dart';
@@ -67,9 +69,13 @@ class EditState extends State<Edit>{
     print('updated: $count');
     list = await helper.listReminder();
 }
+  final format = DateFormat("yyyy-MM-dd HH:mm");
+  String tanggalJam="";
   @override
   Widget build(BuildContext context) {
     HasilEdit h1;
+    TextJudulController.text = this.judul;
+    TextIsiController.text = this.deskripsi;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.deepOrange,
@@ -89,11 +95,26 @@ class EditState extends State<Edit>{
             Text(
                 'Tanggal'
             ),
-            TextFormField(
-              decoration: InputDecoration(
-                  hintText: '${this.tanggal}'
-              ),
-              controller: TextTanggalController,
+            DateTimeField(
+              format: format,
+              onShowPicker: (context, currentValue) async {
+                final date = await showDatePicker(
+                    context: context,
+                    firstDate: DateTime(1900),
+                    initialDate: currentValue ?? DateTime.now(),
+                    lastDate: DateTime(2100));
+                if (date != null) {
+                  final time = await showTimePicker(
+                    context: context,
+                    initialTime:
+                    TimeOfDay.fromDateTime(currentValue ?? DateTime.now()),
+                  );
+                  tanggalJam = (DateTimeField.combine(date, time)).toString();
+                  return DateTimeField.combine(date, time);
+                } else {
+                  return currentValue;
+                }
+              },
             ),
             Text(
                 'Deskripsi'
@@ -109,9 +130,9 @@ class EditState extends State<Edit>{
               onPressed: () =>{
 //                print(TextJudulController.text),
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
-              updateDb(id, TextJudulController.text, TextTanggalController.text, TextIsiController.text),
+              updateDb(id, TextJudulController.text, tanggalJam, TextIsiController.text),
                 print(list),
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,TextTanggalController.text)))
+                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,tanggalJam)))
               },
               child: Text("Save"),
             ),

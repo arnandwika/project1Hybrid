@@ -2,6 +2,7 @@
 import 'package:date_format/date_format.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:project1/Reminder.dart';
@@ -18,8 +19,17 @@ Color hijau = Colors.lightGreenAccent[400];
 Color amber = Colors.amber;
 Color merah = Colors.red;
 
+//Future selectNotification(String payload) async {
+//  if (payload != null) {
+//    debugPrint('notification payload: ' + payload);
+//  }
+//  await Navigator.push(
+//    context,
+//    MaterialPageRoute(builder: (context) => SecondScreen(payload)),
+//  );
+//}
+
 class MyApp extends StatelessWidget {
-  // This widget is the root of your application.
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +45,7 @@ class MyApp extends StatelessWidget {
     );
   }
 }
+
 
 class FirstPage extends StatelessWidget{
   @override
@@ -70,7 +81,7 @@ class FirstPage extends StatelessWidget{
                     Navigator.pushNamed(context, '/history')
                   },
                   child: new Text("History"),
-                )
+                ),
               ],
             )
           ],
@@ -79,7 +90,9 @@ class FirstPage extends StatelessWidget{
     );
   }
 
+
 }
+
 
 class Home extends StatefulWidget{
   @override
