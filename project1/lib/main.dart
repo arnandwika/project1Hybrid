@@ -53,6 +53,8 @@ class FirstPageState extends StatefulWidget{
 }
 
 class FirstPage extends State<FirstPageState>{
+  String title;
+  String content;
   void initState() {
     super.initState();
     initializing();
@@ -98,11 +100,11 @@ class FirstPage extends State<FirstPageState>{
     );
   }
 
-  void showNotifications() async {
-    await notification();
+  void showNotifications(String s1, String s2, int i) async {
+    await notification(s1,s2,i);
   }
 
-  Future<void> notification() async {
+  Future<void> notification(String s1, String s2, int i) async {
     AndroidNotificationDetails androidNotificationDetails =
     AndroidNotificationDetails(
         'Channel ID', 'Channel title', 'channel body',
@@ -115,9 +117,18 @@ class FirstPage extends State<FirstPageState>{
     NotificationDetails notificationDetails =
     NotificationDetails(androidNotificationDetails, iosNotificationDetails);
     await flutterLocalNotificationsPlugin.show(
-        0, 'Hello there', 'please subscribe my channel', notificationDetails);
+        i, s1, s2, notificationDetails);
   }
-
+  Future<void> cekSisa(String tgl,int i) async{
+    DateTime waktu = DateTime.now();
+    DateTime pembanding = convertDateFromString(tgl);
+    Duration diff= waktu.difference(pembanding);
+    if(diff.inHours>=-72){
+      print(diff.inHours);
+      String gabungan = "Akan berlangsung pada ${tgl}";
+      await showNotifications(list[i]['judul'].toString(),gabungan,i);
+    }
+  }
   @override
   Widget build(BuildContext context) {
 //    if(cekDB==false){
@@ -125,6 +136,9 @@ class FirstPage extends State<FirstPageState>{
 //      cekDB=true;
 //      print(cekDB);
 //    }
+    for(int i=0; i<list.length;i++){
+      cekSisa(list[i]['tanggal'].toString(), i);
+    }
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Reminder"),
@@ -141,7 +155,6 @@ class FirstPage extends State<FirstPageState>{
                 new RaisedButton(
                   onPressed: () async =>{
                     await OpenDb(),
-                    await showNotifications(),
                     Navigator.pushNamed(context, '/home'),
                   },
                   child: new Text("List Reminder"),
@@ -254,7 +267,9 @@ Future InsertDb(String judul, String tanggal, String isi) async{
 }
 Future OpenDb() async{
   DB helper = DB.instance;
-  list = await helper.listReminder();
+  DateTime waktu = DateTime.now();
+  String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(waktu);
+  list = await helper.listReminder(formattedDate);
 }
 DateTime convertDateFromString(String strDate){
   DateTime todayDate = DateTime.parse(strDate);
@@ -264,9 +279,9 @@ Color selectColor(String tgl){
   DateTime waktu = DateTime.now();
   DateTime pembanding = convertDateFromString(tgl);
   Duration diff= waktu.difference(pembanding);
-  if(diff.inDays>=-3){
+  if(diff.inHours>=-72){
     return merah;
-  }else if(diff.inDays>=-7){
+  }else if(diff.inHours>=-168){
     return amber;
   }else{
     return hijau;

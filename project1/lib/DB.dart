@@ -33,9 +33,9 @@ class DB{
       "CREATE TABLE reminder(id INTEGER PRIMARY KEY AUTOINCREMENT, judul TEXT, isi TEXT, tanggal TEXT)",);
   }
 
-  Future<List<Map>> listReminder() async {
+  Future<List<Map>> listReminder(formattedDate) async {
     Database dbTemp = await database;
-    return await dbTemp.rawQuery('SELECT * FROM reminder ORDER BY tanggal ASC');
+    return await dbTemp.rawQuery('SELECT * FROM reminder WHERE tanggal > "'+formattedDate+'" ORDER BY tanggal ASC');
   }
 
   Future<List<Map>> listHistory(formattedDate) async {

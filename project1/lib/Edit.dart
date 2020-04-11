@@ -67,7 +67,9 @@ class EditState extends State<Edit>{
     DB helper = DB.instance;
     int count = await helper.editReminder(judulBaru, tanggalBaru, isiBaru, id);
     print('updated: $count');
-    list = await helper.listReminder();
+    DateTime waktu = DateTime.now();
+    String formattedDate = DateFormat('yyyy-MM-dd – kk:mm').format(waktu);
+    list = await helper.listReminder(formattedDate);
 }
   final format = DateFormat("yyyy-MM-dd HH:mm");
   String tanggalJam="";
@@ -135,7 +137,9 @@ class EditState extends State<Edit>{
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
                 await updateDb(id, TextJudulController.text, tanggalJam, TextIsiController.text),
                 print(list),
-                Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,tanggalJam)))
+                Navigator.pop(context),
+                Navigator.pop(context),
+                Navigator.push(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,tanggalJam)))
               },
               child: Text("Save"),
             ),
