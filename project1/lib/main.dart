@@ -129,6 +129,15 @@ class FirstPage extends State<FirstPageState>{
       await showNotifications(list[i]['judul'].toString(),gabungan,i);
     }
   }
+  void notif() async{
+    await OpenDb();
+    if(list.length!=null){
+      for(int i=0; i<list.length;i++){
+        cekSisa(list[i]['tanggal'].toString(), i);
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
 //    if(cekDB==false){
@@ -136,9 +145,8 @@ class FirstPage extends State<FirstPageState>{
 //      cekDB=true;
 //      print(cekDB);
 //    }
-    for(int i=0; i<list.length;i++){
-      cekSisa(list[i]['tanggal'].toString(), i);
-    }
+
+    notif();
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Reminder"),
@@ -154,7 +162,8 @@ class FirstPage extends State<FirstPageState>{
               children: <Widget>[
                 new RaisedButton(
                   onPressed: () async =>{
-                    await OpenDb(),
+//                    await OpenDb(),
+//
                     Navigator.pushNamed(context, '/home'),
                   },
                   child: new Text("List Reminder"),
@@ -424,6 +433,8 @@ class Tambah extends State<StateTambah>{
               onPressed: () async {
                 await InsertDb(_JudulEditingController.text, tanggalJam, _IsiEditingController.text);
                 await OpenDb();
+                Navigator.pop(context);
+                Navigator.pop(context);
                 Navigator.pushNamed(context, '/home');
               },
             )
