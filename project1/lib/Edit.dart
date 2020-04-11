@@ -97,6 +97,9 @@ class EditState extends State<Edit>{
             ),
             DateTimeField(
               format: format,
+              decoration: InputDecoration(
+                hintText: '${this.tanggal}'
+              ),
               onShowPicker: (context, currentValue) async {
                 final date = await showDatePicker(
                     context: context,
@@ -130,7 +133,7 @@ class EditState extends State<Edit>{
               onPressed: () async =>{
 //                print(TextJudulController.text),
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
-              updateDb(id, TextJudulController.text, tanggalJam, TextIsiController.text),
+                await updateDb(id, TextJudulController.text, tanggalJam, TextIsiController.text),
                 print(list),
                 Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => Reminder(id,TextJudulController.text,TextIsiController.text,tanggalJam)))
               },

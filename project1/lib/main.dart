@@ -1,6 +1,7 @@
 
 import 'package:date_format/date_format.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
@@ -37,7 +38,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => FirstPage(),
+          '/': (context) => FirstPageState(),
           '/home': (context) => Home(),
           '/openreminder': (context) => Reminder(0,"","",""),
           '/history': (context) => History(),
@@ -46,8 +47,77 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class FirstPageState extends StatefulWidget{
+  @override
+  FirstPage createState()=> new FirstPage();
+}
 
-class FirstPage extends StatelessWidget{
+class FirstPage extends State<FirstPageState>{
+  void initState() {
+    super.initState();
+    initializing();
+  }
+  
+  FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  FlutterLocalNotificationsPlugin();
+  AndroidInitializationSettings androidInitializationSettings;
+  IOSInitializationSettings iosInitializationSettings;
+  InitializationSettings initializationSettings;
+
+  void initializing() async {
+    androidInitializationSettings = AndroidInitializationSettings('ic_launcher');
+    iosInitializationSettings = IOSInitializationSettings(
+        onDidReceiveLocalNotification: onDidReceiveLocalNotification);
+    initializationSettings = InitializationSettings(
+        androidInitializationSettings, iosInitializationSettings);
+    await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+        onSelectNotification: onSelectNotification);
+  }
+
+  Future onSelectNotification(String payLoad) {
+    if (payLoad != null) {
+      print(payLoad);
+    }
+
+    // we can set navigator to navigate another screen
+  }
+
+  Future onDidReceiveLocalNotification(
+      int id, String title, String body, String payload) async {
+    return CupertinoAlertDialog(
+      title: Text(title),
+      content: Text(body),
+      actions: <Widget>[
+        CupertinoDialogAction(
+            isDefaultAction: true,
+            onPressed: () {
+              print("");
+            },
+            child: Text("Okay")),
+      ],
+    );
+  }
+
+  void showNotifications() async {
+    await notification();
+  }
+
+  Future<void> notification() async {
+    AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(
+        'Channel ID', 'Channel title', 'channel body',
+        priority: Priority.High,
+        importance: Importance.Max,
+        ticker: 'test');
+
+    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+
+    NotificationDetails notificationDetails =
+    NotificationDetails(androidNotificationDetails, iosNotificationDetails);
+    await flutterLocalNotificationsPlugin.show(
+        0, 'Hello there', 'please subscribe my channel', notificationDetails);
+  }
+
   @override
   Widget build(BuildContext context) {
 //    if(cekDB==false){
@@ -71,6 +141,7 @@ class FirstPage extends StatelessWidget{
                 new RaisedButton(
                   onPressed: () async =>{
                     await OpenDb(),
+                    await showNotifications(),
                     Navigator.pushNamed(context, '/home'),
                   },
                   child: new Text("List Reminder"),
