@@ -99,7 +99,6 @@ class FirstPage extends State<FirstPageState>{
       ],
     );
   }
-
   void showNotifications(String s1, String s2, int i) async {
     await notification(s1,s2,i);
   }
@@ -119,14 +118,41 @@ class FirstPage extends State<FirstPageState>{
     await flutterLocalNotificationsPlugin.show(
         i, s1, s2, notificationDetails);
   }
+
+  void showScheduledNotifications(String s1, String s2, int i, alarm) async {
+    await scheduledNotification(s1,s2,i, alarm);
+  }
+
+  Future<void> scheduledNotification(String s1, String s2, int i, alarm) async {
+    var scheduledTime = DateTime.now().add(Duration(seconds: alarm));
+    print(scheduledTime);
+    AndroidNotificationDetails androidNotificationDetails =
+    AndroidNotificationDetails(
+        'Channel ID', 'Channel title', 'channel body',
+        priority: Priority.High,
+        importance: Importance.Max,
+        ticker: 'test');
+
+    IOSNotificationDetails iosNotificationDetails = IOSNotificationDetails();
+
+    NotificationDetails notificationDetails =
+    NotificationDetails(androidNotificationDetails, iosNotificationDetails);
+    await flutterLocalNotificationsPlugin.schedule(
+        i, s1, s2,scheduledTime, notificationDetails);
+  }
   Future<void> cekSisa(String tgl,int i) async{
     DateTime waktu = DateTime.now();
     DateTime pembanding = convertDateFromString(tgl);
     Duration diff= waktu.difference(pembanding);
-    if(diff.inHours>=-72){
-      print(diff.inHours);
+    if(diff.inSeconds>=-259200 && diff.inSeconds<=0){
+      print(diff.inSeconds);
+      int alarm = (diff.inSeconds - diff.inSeconds - diff.inSeconds) - 86400;
       String gabungan = "Akan berlangsung pada ${tgl}";
-      await showNotifications(list[i]['judul'].toString(),gabungan,i);
+      if(alarm>=0){
+        await showScheduledNotifications(list[i]['judul'].toString(),gabungan,i,alarm);
+      }else{
+        await showNotifications(list[i]['judul'].toString(),gabungan,i);
+      }
     }
   }
   void notif() async{
@@ -150,6 +176,7 @@ class FirstPage extends State<FirstPageState>{
     return new Scaffold(
       appBar: new AppBar(
         title: new Text("Reminder"),
+        backgroundColor: Colors.deepOrange,
       ),
       body: new Padding(
         padding: EdgeInsets.all(7.0),
@@ -288,7 +315,7 @@ Color selectColor(String tgl){
   DateTime waktu = DateTime.now();
   DateTime pembanding = convertDateFromString(tgl);
   Duration diff= waktu.difference(pembanding);
-  if(diff.inHours>=-72){
+  if(diff.inHours>=-72 && diff.inHours<=0){
     return merah;
   }else if(diff.inHours>=-168){
     return amber;
@@ -387,6 +414,7 @@ class Tambah extends State<StateTambah>{
   Widget build(BuildContext context) {
     return new Scaffold(
       appBar: new AppBar(
+        backgroundColor: Colors.deepOrange,
       ),
       body: new Padding(padding: EdgeInsets.all(15.0),
         child: new Column(
