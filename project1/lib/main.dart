@@ -3,6 +3,7 @@ import 'package:date_format/date_format.dart';
 import 'package:datetime_picker_formfield/datetime_picker_formfield.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
@@ -175,33 +176,85 @@ class FirstPage extends State<FirstPageState>{
     notif();
     return new Scaffold(
       appBar: new AppBar(
-        title: new Text("Reminder"),
+        title: new Text("QUINGET"),
         backgroundColor: Colors.deepOrange,
       ),
       body: new Padding(
         padding: EdgeInsets.all(7.0),
-        child: new Column(
+        child: new Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            new Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            new Column(
+              mainAxisAlignment: MainAxisAlignment.end,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                new RaisedButton(
-                  onPressed: () async =>{
+                new Padding(
+                  padding: EdgeInsets.only(bottom: 15),
+                  child: new Container(
+                    child: new Image(
+                        image: AssetImage('img/quinget.png')
+                    ),
+                  ),
+                ),
+                new Padding(
+                  padding: EdgeInsets.only(bottom: 100),
+                  child: new Container(
+                    width: 380,
+                    child: new Text(
+                        "Kelola acara dan kegiatanmu sehingga kamu dapat menyelesaikan pekerjaanmu",
+                        textAlign: TextAlign.center,
+                    )
+                  ),
+                ),
+                new Padding(
+                  padding: EdgeInsets.only(bottom: 30),
+                  child: new Container(
+                    width: 380,
+                    decoration: BoxDecoration(
+                        color: Colors.deepOrange,
+                        borderRadius: BorderRadius.all(Radius.circular(50))
+                    ),
+                    child: new RaisedButton(
+                      color: Colors.yellow,
+                      onPressed: () async =>{
 //                    await OpenDb(),
 //
-                    Navigator.pushNamed(context, '/home'),
-                  },
-                  child: new Text("List Reminder"),
+                        Navigator.pushNamed(context, '/home'),
+                      },
+                      child: new Text(
+                        "Cek dan tambahkan reminder di sini!",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17
+                        ),
+                      ),
+                    ),
+                  ),
                 ),
-                new RaisedButton(
-                  onPressed: () async =>{
-                    await searchHistory(),
-                    Navigator.pushNamed(context, '/history')
-                  },
-                  child: new Text("History"),
-                ),
+                new Padding(
+                  padding: EdgeInsets.only(bottom: 80),
+                  child: new Container(
+                    width: 380,
+                    decoration: BoxDecoration(
+                        color: Colors.deepOrange,
+                        borderRadius: BorderRadius.all(Radius.circular(50))
+                    ),
+                    child: new RaisedButton(
+                      color: Colors.yellow,
+                      onPressed: () async =>{
+                        await searchHistory(),
+                        Navigator.pushNamed(context, '/history')
+                      },
+                      child: new Text(
+                        "Lihat kegiatan apa saja yang pernah kamu lakukan",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 17
+                        ),
+                      ),
+                    ),
+                  ),
+                )
               ],
             )
           ],
