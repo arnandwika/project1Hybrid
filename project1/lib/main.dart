@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:project1/Reminder.dart';
+import 'package:project1/Splash2.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'DB.dart';
@@ -39,12 +40,19 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
         routes: <String, WidgetBuilder>{
-          '/': (context) => FirstPageState(),
+          '/': (context) => SplashScreen(),
+          '/firstPage': (context) => FirstPageState(),
           '/home': (context) => Home(),
           '/openreminder': (context) => Reminder(0,"","",""),
           '/history': (context) => History(),
         }
     );
+  }
+}
+
+class MyNavigator {
+  static void goToFirstPage(BuildContext context) {
+    Navigator.pushReplacementNamed(context, "/firstPage");
   }
 }
 
