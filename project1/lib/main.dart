@@ -76,7 +76,7 @@ class FirstPage extends State<FirstPageState>{
   InitializationSettings initializationSettings;
 
   void initializing() async {
-    androidInitializationSettings = AndroidInitializationSettings('quinget.png');
+    androidInitializationSettings = AndroidInitializationSettings('quinget');
     iosInitializationSettings = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     initializationSettings = InitializationSettings(
