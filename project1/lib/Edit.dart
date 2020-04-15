@@ -136,6 +136,7 @@ class EditState extends State<Edit>{
 //                print(TextJudulController.text),
 //                h1 = HasilEdit(judul: TextJudulController.text, tanggal: TextTanggalController.text, isi: TextIsiController.text),
                 await updateDb(id, TextJudulController.text, tanggalJam, TextIsiController.text),
+                await OpenDb(),
                 print(list),
                 Navigator.pop(context),
                 Navigator.pop(context),

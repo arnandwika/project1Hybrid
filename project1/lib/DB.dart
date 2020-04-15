@@ -40,6 +40,7 @@ class DB{
 
   Future<List<Map>> listHistory(formattedDate) async {
     Database dbTemp = await database;
+    print(formattedDate);
     return await dbTemp.rawQuery('SELECT * FROM reminder WHERE tanggal < "'+formattedDate+'" ORDER BY tanggal ASC');
   }
 

@@ -12,6 +12,7 @@ import 'package:project1/Splash2.dart';
 import 'package:sqflite/sqflite.dart';
 
 import 'DB.dart';
+import 'ReminderHistory.dart';
 
 void main() => runApp(MyApp());
 List<Map> list;
@@ -634,7 +635,7 @@ class CardHistory extends StatelessWidget {
       child: InkWell(
         onTap: ()=>{
           Navigator.push(context, MaterialPageRoute(
-            builder: (context) =>Reminder(
+            builder: (context) =>ReminderHistory(
                 listHistory[i]['id'],listHistory[i]['judul'],listHistory[i]['isi'],listHistory[i]['tanggal']
             ),
           ),
