@@ -76,7 +76,7 @@ class FirstPage extends State<FirstPageState>{
   InitializationSettings initializationSettings;
 
   void initializing() async {
-    androidInitializationSettings = AndroidInitializationSettings('ic_launcher');
+    androidInitializationSettings = AndroidInitializationSettings('quinget.png');
     iosInitializationSettings = IOSInitializationSettings(
         onDidReceiveLocalNotification: onDidReceiveLocalNotification);
     initializationSettings = InitializationSettings(
@@ -199,6 +199,7 @@ class FirstPage extends State<FirstPageState>{
                 new Padding(
                   padding: EdgeInsets.only(bottom: 15),
                   child: new Container(
+                    width: 220,
                     child: new Image(
                         image: AssetImage('img/quinget.png')
                     ),
@@ -207,7 +208,7 @@ class FirstPage extends State<FirstPageState>{
                 new Padding(
                   padding: EdgeInsets.only(bottom: 100),
                   child: new Container(
-                    width: 380,
+                    width: 345,
                     child: new Text(
                         "Kelola acara dan kegiatanmu sehingga kamu dapat menyelesaikan pekerjaanmu",
                         textAlign: TextAlign.center,
@@ -217,7 +218,7 @@ class FirstPage extends State<FirstPageState>{
                 new Padding(
                   padding: EdgeInsets.only(bottom: 30),
                   child: new Container(
-                    width: 380,
+                    width: 345,
                     decoration: BoxDecoration(
                         color: Colors.deepOrange,
                         borderRadius: BorderRadius.all(Radius.circular(50))
@@ -242,7 +243,7 @@ class FirstPage extends State<FirstPageState>{
                 new Padding(
                   padding: EdgeInsets.only(bottom: 80),
                   child: new Container(
-                    width: 380,
+                    width: 345,
                     decoration: BoxDecoration(
                         color: Colors.deepOrange,
                         borderRadius: BorderRadius.all(Radius.circular(50))
@@ -376,9 +377,9 @@ Color selectColor(String tgl){
   DateTime waktu = DateTime.now();
   DateTime pembanding = convertDateFromString(tgl);
   Duration diff= waktu.difference(pembanding);
-  if(diff.inHours>=-72 && diff.inHours<=0){
+  if(diff.inSeconds>=-259200 && diff.inSeconds<=0){
     return merah;
-  }else if(diff.inHours>=-168){
+  }else if(diff.inSeconds>=-604800){
     return amber;
   }else{
     return hijau;
